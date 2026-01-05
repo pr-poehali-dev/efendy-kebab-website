@@ -4,11 +4,13 @@ import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ContentSections from '@/components/ContentSections';
 import OrderModal from '@/components/OrderModal';
+import MapModal from '@/components/MapModal';
 import Footer from '@/components/Footer';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const [mapModalOpen, setMapModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [orderForm, setOrderForm] = useState({ name: '', phone: '', address: '', comment: '' });
   const [contactForm, setContactForm] = useState({ name: '', phone: '', message: '' });
@@ -105,6 +107,7 @@ const Index = () => {
         contactForm={contactForm}
         setContactForm={setContactForm}
         submitContactForm={submitContactForm}
+        onMapClick={() => setMapModalOpen(true)}
       />
       <Footer scrollToSection={scrollToSection} />
       <OrderModal 
@@ -114,6 +117,10 @@ const Index = () => {
         orderForm={orderForm}
         setOrderForm={setOrderForm}
         submitOrder={submitOrder}
+      />
+      <MapModal 
+        open={mapModalOpen}
+        onOpenChange={setMapModalOpen}
       />
     </div>
   );

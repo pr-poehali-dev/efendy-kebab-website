@@ -15,6 +15,7 @@ interface ContentSectionsProps {
   contactForm: { name: string; phone: string; message: string };
   setContactForm: (form: any) => void;
   submitContactForm: (e: React.FormEvent) => void;
+  onMapClick: () => void;
 }
 
 const ContentSections = ({ 
@@ -25,7 +26,8 @@ const ContentSections = ({
   handleOrder, 
   contactForm, 
   setContactForm, 
-  submitContactForm 
+  submitContactForm,
+  onMapClick 
 }: ContentSectionsProps) => {
   return (
     <>
@@ -208,7 +210,7 @@ const ContentSections = ({
                   <p className="text-muted-foreground">Сб — выходной</p>
                 </div>
               </div>
-              <Button size="lg" className="w-full bg-primary hover:bg-primary/90">
+              <Button size="lg" className="w-full bg-primary hover:bg-primary/90" onClick={onMapClick}>
                 <Icon name="Navigation" size={20} className="mr-2" />
                 Как добраться
               </Button>
