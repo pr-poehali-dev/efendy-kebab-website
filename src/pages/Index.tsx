@@ -2,10 +2,19 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/use-toast';
 import Icon from '@/components/ui/icon';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState('home');
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [orderForm, setOrderForm] = useState({ name: '', phone: '', address: '', comment: '' });
+  const [contactForm, setContactForm] = useState({ name: '', phone: '', message: '' });
 
   const menuItems = [
     {
@@ -35,6 +44,12 @@ const Index = () => {
     }
   ];
 
+  const news = [
+    { id: 1, title: 'Скидка 15% на первый заказ', description: 'Новым клиентам — специальное предложение!', date: '10 января 2024', badge: 'Акция' },
+    { id: 2, title: 'Новинка: Хинкали с бараниной', description: 'Попробуйте традиционные грузинские хинкали', date: '5 января 2024', badge: 'Новинка' },
+    { id: 3, title: 'Бесплатная доставка от 2000₽', description: 'При заказе от 2000 рублей доставка бесплатно', date: '1 января 2024', badge: 'Акция' }
+  ];
+
   const reviews = [
     { id: 1, name: 'Анна К.', rating: 5, text: 'Манты просто восхитительные! Как в детстве у бабушки. Заказываю постоянно!' },
     { id: 2, name: 'Дмитрий П.', rating: 5, text: 'Отличное качество продуктов глубокой заморозки. Всё свежее и вкусное.' },
@@ -55,6 +70,31 @@ const Index = () => {
     element?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleOrder = (item: any) => {
+    setSelectedItem(item);
+    setOrderModalOpen(true);
+  };
+
+  const submitOrder = () => {
+    if (!orderForm.name || !orderForm.phone) {
+      toast({ title: 'Ошибка', description: 'Заполните имя и телефон', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Заказ принят!', description: 'Мы свяжемся с вами в ближайшее время' });
+    setOrderModalOpen(false);
+    setOrderForm({ name: '', phone: '', address: '', comment: '' });
+  };
+
+  const submitContactForm = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactForm.name || !contactForm.phone || !contactForm.message) {
+      toast({ title: 'Ошибка', description: 'Заполните все поля', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Сообщение отправлено!', description: 'Спасибо за обращение, мы свяжемся с вами' });
+    setContactForm({ name: '', phone: '', message: '' });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border shadow-sm">
@@ -68,6 +108,7 @@ const Index = () => {
               <button onClick={() => scrollToSection('home')} className="text-sm font-medium hover:text-primary transition-colors">Главная</button>
               <button onClick={() => scrollToSection('about')} className="text-sm font-medium hover:text-primary transition-colors">О нас</button>
               <button onClick={() => scrollToSection('menu')} className="text-sm font-medium hover:text-primary transition-colors">Меню</button>
+              <button onClick={() => scrollToSection('news')} className="text-sm font-medium hover:text-primary transition-colors">Новости</button>
               <button onClick={() => scrollToSection('gallery')} className="text-sm font-medium hover:text-primary transition-colors">Галерея</button>
               <button onClick={() => scrollToSection('reviews')} className="text-sm font-medium hover:text-primary transition-colors">Отзывы</button>
               <button onClick={() => scrollToSection('contacts')} className="text-sm font-medium hover:text-primary transition-colors">Контакты</button>
@@ -174,9 +215,40 @@ const Index = () => {
                     <p className="text-2xl font-bold text-primary">{item.price} ₽</p>
                     <p className="text-sm text-muted-foreground">{item.weight}</p>
                   </div>
-                  <Button className="bg-primary hover:bg-primary/90">
+                  <Button className="bg-primary hover:bg-primary/90" onClick={() => handleOrder(item)}>
                     <Icon name="ShoppingCart" size={16} className="mr-2" />
                     Заказать
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="news" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">Новости и акции</h2>
+            <p className="text-lg text-muted-foreground">Специальные предложения и новинки</p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {news.map((item, index) => (
+              <Card key={item.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <CardTitle className="text-xl flex-1">{item.title}</CardTitle>
+                    <Badge className="bg-primary text-white">{item.badge}</Badge>
+                  </div>
+                  <CardDescription className="text-sm text-muted-foreground">{item.date}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{item.description}</p>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" className="w-full">
+                    <Icon name="Sparkles" size={16} className="mr-2" />
+                    Узнать подробнее
                   </Button>
                 </CardFooter>
               </Card>
@@ -233,7 +305,7 @@ const Index = () => {
       <section id="contacts" className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-12 text-foreground">Контакты</h2>
-          <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-12 max-w-6xl mx-auto">
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
                 <Icon name="MapPin" size={24} className="text-primary mt-1" />
@@ -262,6 +334,53 @@ const Index = () => {
                 Как добраться
               </Button>
             </div>
+            
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Форма обратной связи</CardTitle>
+                <CardDescription>Напишите нам, и мы свяжемся с вами в ближайшее время</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={submitContactForm} className="space-y-4">
+                  <div>
+                    <Label htmlFor="contact-name">Имя</Label>
+                    <Input 
+                      id="contact-name" 
+                      placeholder="Ваше имя" 
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-phone">Телефон</Label>
+                    <Input 
+                      id="contact-phone" 
+                      type="tel" 
+                      placeholder="+7 (___) ___-__-__" 
+                      value={contactForm.phone}
+                      onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-message">Сообщение</Label>
+                    <Textarea 
+                      id="contact-message" 
+                      placeholder="Ваше сообщение" 
+                      rows={4}
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                    />
+                  </div>
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
+                    <Icon name="Send" size={16} className="mr-2" />
+                    Отправить
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="mt-12 max-w-6xl mx-auto">
             <div className="h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <iframe 
                 src="https://yandex.ru/map-widget/v1/?ll=48.389765%2C54.324511&mode=search&ol=geo&ouri=ymapsbm1%3A%2F%2Fgeo%3Fdata%3DCgg1MzEyMDczNxJI0KDQvtGB0YHQuNGPLCDQo9C70YzRj9C90L7QstGB0LosINCf0YDQvtC80YvRiNC70LXQvdC90LDRjyDRg9C70LjRhtCwLCA3NtCQIgoNLFLBQRXhZldC&z=16" 
@@ -315,6 +434,74 @@ const Index = () => {
       >
         <Icon name="Phone" size={24} />
       </a>
+
+      <Dialog open={orderModalOpen} onOpenChange={setOrderModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Оформление заказа</DialogTitle>
+            <DialogDescription>
+              {selectedItem && (
+                <div className="flex items-center space-x-3 mt-4 p-3 bg-accent rounded-lg">
+                  <img src={selectedItem.image} alt={selectedItem.name} className="w-16 h-16 object-cover rounded-lg" />
+                  <div>
+                    <p className="font-semibold text-foreground">{selectedItem.name}</p>
+                    <p className="text-primary font-bold">{selectedItem.price} ₽ / {selectedItem.weight}</p>
+                  </div>
+                </div>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="order-name">Имя *</Label>
+              <Input 
+                id="order-name" 
+                placeholder="Ваше имя" 
+                value={orderForm.name}
+                onChange={(e) => setOrderForm({...orderForm, name: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="order-phone">Телефон *</Label>
+              <Input 
+                id="order-phone" 
+                type="tel" 
+                placeholder="+7 (___) ___-__-__" 
+                value={orderForm.phone}
+                onChange={(e) => setOrderForm({...orderForm, phone: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="order-address">Адрес доставки</Label>
+              <Input 
+                id="order-address" 
+                placeholder="Укажите адрес" 
+                value={orderForm.address}
+                onChange={(e) => setOrderForm({...orderForm, address: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="order-comment">Комментарий</Label>
+              <Textarea 
+                id="order-comment" 
+                placeholder="Дополнительные пожелания" 
+                rows={3}
+                value={orderForm.comment}
+                onChange={(e) => setOrderForm({...orderForm, comment: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOrderModalOpen(false)}>
+              Отмена
+            </Button>
+            <Button className="bg-primary hover:bg-primary/90" onClick={submitOrder}>
+              <Icon name="ShoppingCart" size={16} className="mr-2" />
+              Оформить заказ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
